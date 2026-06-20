@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fee Management - Edubase Admin</title>
+<link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+
+  <header>
+    <div class="brand">📘 Edubase</div>
+    <div class="role-badge">ADMIN PORTAL</div>
+  </header>
+
+  <div class="page-wrap">
+    <div class="page-title">Fee Management</div>
+    <div class="page-subtitle">Track and collect student fees</div>
+
+    <!-- Summary stats -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="label">Total Students</div>
+        <div class="value" id="statTotal">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Fully Paid</div>
+        <div class="value" id="statPaid">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Pending</div>
+        <div class="value" id="statDue">0</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Total Collected (₹)</div>
+        <div class="value" id="statAmount">0</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <input type="text" class="search-input" id="searchBox" placeholder="Search student by name...">
+      <button class="btn btn-secondary" onclick="openAddFeeModal()">+ Add Fee Record</button>
+    </div>
+
+    <!-- Fee table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Total Fee (₹)</th>
+          <th>Paid (₹)</th>
+          <th>Balance (₹)</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="feeTableBody">
+        <!-- rows added by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <footer>Edubase — Admin Portal</footer>
+
+  <!-- Add / Update Fee Modal -->
+  <div class="modal-overlay" id="feeModal">
+    <div class="modal-box">
+      <h3 id="modalTitle">Add Fee Record</h3>
+
+      <label>Student Name</label>
+      <input type="text" id="studentNameInput" placeholder="e.g. Aarav Sharma">
+
+      <label>Class</label>
+      <input type="text" id="classInput" placeholder="e.g. 10th A">
+
+      <label>Total Fee (₹)</label>
+      <input type="number" id="totalFeeInput" placeholder="e.g. 25000">
+
+      <label>Paid Amount (₹)</label>
+      <input type="number" id="paidFeeInput" placeholder="e.g. 10000">
+
+      <div class="modal-actions">
+        <button class="btn" style="background:#eee;" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveFeeRecord()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Sample data (this will later come from the Python backend via fetch API) ----
+    let feeRecords = [
+      { id: 1, name: "Aarav Sharma",  className: "10th A", total: 25000, paid: 25000 },
+      { id: 2, name: "Diya Patel",    className: "9th B",  total: 22000, paid: 10000 },
+      { id: 3, name: "Kabir Singh",   className: "10th A", total: 25000, paid: 0 },
+      { id: 4, name: "Meera Iyer",    className: "8th C",  total: 20000, paid: 20000 },
+    ];
+
+    let editingId = null;
+
+    function renderTable(data) {
+      const tbody = document.getElementById("feeTableBody");
+      tbody.innerHTML = "";
+
+      data.forEach(record => {
+        const balance = record.total - record.paid;
+        let status = "Pending";
+        let badgeClass = "badge-due";
+
+        if (balance <= 0) {
+          status = "Paid";
+          badgeClass = "badge-paid";
+        } else if (record.paid === 0) {
+          status = "Overdue";
+          badgeClass = "badge-overdue";
+        }
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${record.name}</td>
+          <td>${record.className}</td>
+          <td>${record.total.toLocaleString()}</td>
+          <td>${record.paid.toLocaleString()}</td>
+          <td>${balance.toLocaleString()}</td>
+          <td><span class="badge ${badgeClass}">${status}</span></td>
+          <td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px;" onclick="editFeeRecord(${record.id})">Update</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      updateStats(data);
+    }
+
+    function updateStats(data) {
+      document.getElementById("statTotal").textContent = data.length;
+      document.getElementById("statPaid").textContent = data.filter(r => r.paid >= r.total).length;
+      document.getElementById("statDue").textContent = data.filter(r => r.paid < r.total).length;
+      const totalCollected = data.reduce((sum, r) => sum + r.paid, 0);
+      document.getElementById("statAmount").textContent = totalCollected.toLocaleString();
+    }
+
+    function openAddFeeModal() {
+      editingId = null;
+      document.getElementById("modalTitle").textContent = "Add Fee Record";
+      document.getElementById("studentNameInput").value = "";
+      document.getElementById("classInput").value = "";
+      document.getElementById("totalFeeInput").value = "";
+      document.getElementById("paidFeeInput").value = "";
+      document.getElementById("feeModal").classList.add("active");
+    }
+
+    function editFeeRecord(id) {
+      const record = feeRecords.find(r => r.id === id);
+      editingId = id;
+      document.getElementById("modalTitle").textContent = "Update Fee Record";
+      document.getElementById("studentNameInput").value = record.name;
+      document.getElementById("classInput").value = record.className;
+      document.getElementById("totalFeeInput").value = record.total;
+      document.getElementById("paidFeeInput").value = record.paid;
+      document.getElementById("feeModal").classList.add("active");
+    }
+
+    function closeModal() {
+      document.getElementById("feeModal").classList.remove("active");
+    }
+
+    function saveFeeRecord() {
+      const name = document.getElementById("studentNameInput").value.trim();
+      const className = document.getElementById("classInput").value.trim();
+      const total = parseFloat(document.getElementById("totalFeeInput").value) || 0;
+      const paid = parseFloat(document.getElementById("paidFeeInput").value) || 0;
+
+      if (!name || !className || !total) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      if (editingId) {
+        // update existing
+        const record = feeRecords.find(r => r.id === editingId);
+        record.name = name;
+        record.className = className;
+        record.total = total;
+        record.paid = paid;
+      } else {
+        // add new
+        feeRecords.push({
+          id: feeRecords.length + 1,
+          name, className, total, paid
+        });
+      }
+
+      closeModal();
+      renderTable(feeRecords);
+    }
+
+    // Search filter
+    document.getElementById("searchBox").addEventListener("input", function () {
+      const term = this.value.toLowerCase();
+      const filtered = feeRecords.filter(r => r.name.toLowerCase().includes(term));
+      renderTable(filtered);
+    });
+
+    // Initial render
+    renderTable(feeRecords);
+  </script>
+
+</body>
+</html>

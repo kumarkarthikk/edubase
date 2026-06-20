@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Fees - Edubase</title>
+<link rel="stylesheet" href="../static/css/style.css">
+<style>
+  .fee-summary-card {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 25px;
+  }
+
+  .progress-bar-bg {
+    background: #eee;
+    border-radius: 20px;
+    height: 14px;
+    width: 100%;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .progress-bar-fill {
+    background: linear-gradient(90deg, #14213d, #fca311);
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.4s ease;
+  }
+
+  .fee-detail-card {
+    margin-top: 25px;
+  }
+
+  .fee-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+  }
+
+  .fee-row:last-child { border-bottom: none; }
+
+  .fee-row .label { color: #666; }
+  .fee-row .value { font-weight: 600; color: #14213d; }
+
+  .pay-btn-wrap {
+    margin-top: 20px;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">📘 Edubase</div>
+    <div class="role-badge">PARENT / STUDENT PORTAL</div>
+  </header>
+
+  <div class="page-wrap">
+    <div class="page-title">My Fee Status</div>
+    <div class="page-subtitle">Student: <span id="studentNameDisplay">Aarav Sharma</span> · Class: <span id="studentClassDisplay">10th A</span></div>
+
+    <!-- Top stat cards -->
+    <div class="fee-summary-card">
+      <div class="stat-box">
+        <div class="label">Total Fee</div>
+        <div class="value">₹<span id="totalFeeDisplay">25,000</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Paid</div>
+        <div class="value">₹<span id="paidFeeDisplay">10,000</span></div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Balance Due</div>
+        <div class="value">₹<span id="balanceFeeDisplay">15,000</span></div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between;">
+        <span style="font-weight:600;">Payment Progress</span>
+        <span id="progressPercent">40%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill" style="width: 40%;"></div>
+      </div>
+    </div>
+
+    <!-- Detailed breakdown -->
+    <div class="card fee-detail-card">
+      <div style="font-weight:600; margin-bottom:10px; color:#14213d;">Fee Breakdown</div>
+      <div class="fee-row">
+        <span class="label">Tuition Fee</span>
+        <span class="value">₹18,000</span>
+      </div>
+      <div class="fee-row">
+        <span class="label">Transport Fee</span>
+        <span class="value">₹5,000</span>
+      </div>
+      <div class="fee-row">
+        <span class="label">Activity Fee</span>
+        <span class="value">₹2,000</span>
+      </div>
+      <div class="fee-row">
+        <span class="label">Due Date</span>
+        <span class="value" id="dueDateDisplay">15th July 2026</span>
+      </div>
+      <div class="fee-row">
+        <span class="label">Status</span>
+        <span class="badge badge-due" id="statusBadge">Pending</span>
+      </div>
+
+      <div class="pay-btn-wrap">
+        <button class="btn btn-secondary" onclick="payNow()">Pay Now</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Edubase — Parent & Student Portal</footer>
+
+  <script>
+    // ---- Sample data (later this will be fetched from backend based on logged-in student) ----
+    const feeData = {
+      studentName: "Aarav Sharma",
+      className: "10th A",
+      total: 25000,
+      paid: 10000,
+      dueDate: "15th July 2026"
+    };
+
+    function renderFeeStatus() {
+      const balance = feeData.total - feeData.paid;
+      const percent = Math.round((feeData.paid / feeData.total) * 100);
+
+      document.getElementById("studentNameDisplay").textContent = feeData.studentName;
+      document.getElementById("studentClassDisplay").textContent = feeData.className;
+      document.getElementById("totalFeeDisplay").textContent = feeData.total.toLocaleString();
+      document.getElementById("paidFeeDisplay").textContent = feeData.paid.toLocaleString();
+      document.getElementById("balanceFeeDisplay").textContent = balance.toLocaleString();
+      document.getElementById("progressPercent").textContent = percent + "%";
+      document.getElementById("progressBarFill").style.width = percent + "%";
+      document.getElementById("dueDateDisplay").textContent = feeData.dueDate;
+
+      const statusBadge = document.getElementById("statusBadge");
+      if (balance <= 0) {
+        statusBadge.textContent = "Paid";
+        statusBadge.className = "badge badge-paid";
+      } else {
+        statusBadge.textContent = "Pending";
+        statusBadge.className = "badge badge-due";
+      }
+    }
+
+    function payNow() {
+      alert("Redirecting to payment gateway... (This will connect to the payment system later.)");
+    }
+
+    renderFeeStatus();
+  </script>
+
+</body>
+</html>
