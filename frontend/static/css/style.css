@@ -229,3 +229,12 @@ footer {
   color: #888;
   font-size: 13px;
 }
+
+
+.portal-card {
+    transition: transform 0.3s ease;
+}
+
+.portal-card:hover {
+    transform: translateY(-4px);
+}
