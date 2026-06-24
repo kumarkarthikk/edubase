@@ -1,0 +1,3 @@
+mkdir -p data
+echo '{"students":1250,"teachers":75}' > data/dashboard-stats.json
+
