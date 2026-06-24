@@ -1,5 +1,0 @@
-
-echo '{"students":1250,"teachers":75}' > data/dashboard-stats.json
-
-git add .
-git commit -m "feat: add dashboard statistics placeholders"
