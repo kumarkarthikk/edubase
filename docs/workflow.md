@@ -1,8 +1,4 @@
-# Workflow
+echo "# School Workflow" > docs/workflow.md
 
-1. Student Admission
-2. Class Allocation
-3. Attendance Tracking
-4. Exam Management
-5. Report Generation
-6. Parent Communication
+git add .
+git commit -m "docs: add workflow documentation"

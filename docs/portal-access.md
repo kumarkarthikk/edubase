@@ -1,8 +1,5 @@
-# Portal Access Matrix
+mkdir -p docs
+echo "# Portal Access Matrix" > docs/portal-access.md
 
-| Module | Principal | Staff | Admin Staff | Parent |
-|----------|----------|----------|----------|----------|
-| Attendance | ✓ | ✓ | ✓ | View |
-| Fees | View | - | ✓ | View |
-| Reports | ✓ | View | View | - |
-| Student Records | ✓ | ✓ | ✓ | View |
+git add .
+git commit -m "docs: add portal access matrix"

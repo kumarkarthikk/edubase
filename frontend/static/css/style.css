@@ -231,10 +231,3 @@ footer {
 }
 
 
-.portal-card {
-    transition: transform 0.3s ease;
-}
-
-.portal-card:hover {
-    transform: translateY(-4px);
-}
